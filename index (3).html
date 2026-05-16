@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>LaParada — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A08;--s1:#111110;--s2:#191918;--s3:#222220;
+  --b:#2A2A28;--b2:#333330;
+  --y:#F4C430;--yd:rgba(244,196,48,.13);--yd2:rgba(244,196,48,.06);
+  --t:#EDECEA;--t2:#888882;--t3:#3E3E38;
+  --g:#3DD68C;--gd:rgba(61,214,140,.13);
+  --r:#F06449;--rd:rgba(240,100,73,.13);
+  --blue:#378ADD;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+input,select,button{font-family:inherit}
+button{cursor:pointer}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:224px;background:var(--s1);border-right:1px solid var(--b);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;overflow-y:auto}
+.main{margin-left:224px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding-bottom:68px}}
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+.logo-wrap{padding:22px 20px 18px;border-bottom:1px solid var(--b)}
+.logo-mark{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.logo-dot{width:8px;height:8px;background:var(--y);border-radius:50%}
+.logo-name{font-size:17px;font-weight:700;letter-spacing:.14em;color:var(--y);line-height:1}
+.logo-tagline{font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;padding-left:16px}
+.nav{padding:10px 0;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:13.5px;color:var(--t2);cursor:pointer;transition:all .12s;border-left:2px solid transparent;position:relative}
+.nav-item:hover{color:var(--t);background:var(--yd2)}
+.nav-item.on{color:var(--y);border-left-color:var(--y);background:var(--yd)}
+.nav-icon{width:17px;height:17px;flex-shrink:0;opacity:.7}
+.nav-item.on .nav-icon{opacity:1}
+.nav-section{padding:16px 18px 6px;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em}
+.sidebar-foot{padding:16px 20px;border-top:1px solid var(--b)}
+.upd-lbl{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.upd-val{font-size:12px;color:var(--t2);margin-top:3px}
+
+/* ── Top bar ────────────────────────────────────────────────── */
+.topbar{padding:18px 28px 16px;border-bottom:1px solid var(--b);background:var(--s1);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+@media(max-width:768px){.topbar{padding:14px 16px}}
+.topbar-left h1{font-size:18px;font-weight:700}
+.topbar-left p{font-size:12px;color:var(--t2);margin-top:2px}
+.refresh-btn{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:7px 14px;font-size:13px;color:var(--t2);display:flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.refresh-btn:hover{border-color:var(--y);color:var(--y)}
+.refresh-btn svg{width:13px;height:13px;flex-shrink:0}
+
+/* ── Page ───────────────────────────────────────────────────── */
+.page{padding:24px 28px;flex:1}
+@media(max-width:768px){.page{padding:14px 14px}}
+.sec-label{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+
+/* ── KPI grid ───────────────────────────────────────────────── */
+.kgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+@media(min-width:580px){.kgrid{grid-template-columns:repeat(4,1fr)}}
+.kcard{background:var(--s1);border:1px solid var(--b);border-radius:12px;padding:16px 16px 14px;transition:border-color .15s}
+.kcard:hover{border-color:var(--b2)}
+.kcard.hl{border-color:rgba(244,196,48,.25);background:var(--yd2)}
+.klbl{font-size:10.5px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}
+.kval{font-size:23px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.kval.pos{color:var(--g)}
+.kval.neg{color:var(--r)}
+.kval.yel{color:var(--y)}
+.ksub{font-size:11.5px;color:var(--t2);margin-top:4px}
+
+/* ── Event cards ────────────────────────────────────────────── */
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-bottom:20px}
+.ecard{background:var(--s1);border:1px solid var(--b);border-radius:14px;padding:18px 20px;cursor:pointer;transition:all .18s}
+.ecard:hover{border-color:rgba(244,196,48,.35);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.ecard-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.ecard-name{font-size:15px;font-weight:600;line-height:1.2}
+.ecard-meta{font-size:11px;color:var(--t2);margin-top:3px}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:99px}
+.pill-g{background:var(--gd);color:var(--g)}
+.pill-y{background:var(--yd);color:var(--y)}
+.pill-r{background:var(--rd);color:var(--r)}
+.pill-n{background:var(--s3);color:var(--t2)}
+.ecard-metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.em-lbl{font-size:10px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.em-val{font-size:13.5px;font-weight:600}
+
+/* ── Card ───────────────────────────────────────────────────── */
+.card{background:var(--s1);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.card-head{padding:14px 20px;border-bottom:1px solid var(--b);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.card-sub{font-size:12px;font-weight:400;color:var(--t2)}
+
+/* ── Tables ─────────────────────────────────────────────────── */
+.thr{padding:9px 20px;background:var(--s2);border-bottom:1px solid var(--b);display:grid;font-size:10.5px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em}
+.trow{display:grid;padding:11px 20px;border-bottom:.5px solid var(--b);font-size:13px;align-items:center;transition:background .1s}
+.trow:last-child{border-bottom:none}
+.trow:hover{background:var(--s2)}
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.bi{background:var(--gd);color:var(--g)}
+.bg{background:var(--rd);color:var(--r)}
+
+/* ── P&L rows ───────────────────────────────────────────────── */
+.pl-row{display:flex;justify-content:space-between;align-items:center;padding:9px 20px;border-bottom:.5px solid var(--b);font-size:13px}
+.pl-row:last-child{border-bottom:none}
+.pl-row.bold{font-weight:600}
+.pl-row.sub{background:var(--s2);font-size:12px;padding-left:32px}
+
+/* ── Compare ────────────────────────────────────────────────── */
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{padding:6px 14px;border-radius:99px;border:1px solid var(--b);font-size:13px;color:var(--t2);cursor:pointer;transition:all .12s;user-select:none}
+.chip:hover{border-color:var(--b2);color:var(--t)}
+.chip.on{background:var(--yd);border-color:var(--y);color:var(--y)}
+.cthr{display:grid;padding:9px 16px;background:var(--s2);border-bottom:1px solid var(--b);font-size:10.5px;color:var(--t2);text-transform:uppercase;letter-spacing:.06em}
+.ctr{display:grid;padding:9px 16px;border-bottom:.5px solid var(--b);font-size:13px;align-items:center;transition:background .1s}
+.ctr:hover{background:var(--s2)}
+.ctr:last-child{border-bottom:none}
+.ctr.bold{font-weight:600;background:var(--s2)}
+.chart-wrap{padding:20px;height:260px;position:relative}
+@media(min-width:640px){.chart-wrap{height:300px}}
+
+/* ── Filters ────────────────────────────────────────────────── */
+.filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.search-inp{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--t);outline:none;width:200px;transition:border-color .15s}
+.search-inp:focus{border-color:var(--y)}
+.search-inp::placeholder{color:var(--t3)}
+.fselect{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--t);outline:none;cursor:pointer;transition:border-color .15s}
+.fselect:focus{border-color:var(--y)}
+.fselect option{background:var(--s2)}
+
+/* ── Bottom nav ─────────────────────────────────────────────── */
+.bnav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b);z-index:50}
+@media(max-width:768px){.bnav{display:flex}}
+.bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 0 7px;font-size:9.5px;color:var(--t2);cursor:pointer;transition:color .12s;text-transform:uppercase;letter-spacing:.06em}
+.bn-item.on{color:var(--y)}
+.bn-item svg{width:20px;height:20px}
+
+/* ── States ─────────────────────────────────────────────────── */
+.loading-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:380px;gap:14px;color:var(--t2)}
+.spinner{width:30px;height:30px;border:2px solid var(--b2);border-top-color:var(--y);border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.errbox{background:var(--rd);border:1px solid rgba(240,100,73,.3);border-radius:12px;padding:14px 18px;font-size:13px;color:var(--r);margin-bottom:16px}
+.empty{padding:32px 20px;text-align:center;color:var(--t2);font-size:13px}
+
+/* ── Back btn ───────────────────────────────────────────────── */
+.back-btn{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:6px 13px;font-size:13px;color:var(--t2);transition:all .12s}
+.back-btn:hover{border-color:var(--b2);color:var(--t)}
+
+/* ── Avatar ─────────────────────────────────────────────────── */
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--yd);color:var(--y);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;flex-shrink:0}
+
+/* ── Scroll hint ────────────────────────────────────────────── */
+.scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scroll-x::-webkit-scrollbar{height:4px}
+.scroll-x::-webkit-scrollbar-track{background:var(--s2)}
+.scroll-x::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ── Config ─────────────────────────────────────────────────────────────────
+const API = 'https://script.google.com/macros/s/AKfycbwf7tYWTJ8iJAaiAKP7ooUG7tjlIrc0d4ZKRhxvdtgeJXSdgZmuOt3gPlbVDdZ429FH3A/exec';
+const PALETTE = ['#F4C430','#3DD68C','#378ADD','#F06449','#A78BFA','#FB923C','#2DD4BF'];
+
+// ── Utils ──────────────────────────────────────────────────────────────────
+function cop(n){
+  if(n==null)return'—';
+  const a=Math.abs(n),s=n<0?'-':'';
+  if(a>=1e9)return s+'$'+(a/1e9).toFixed(1)+'B';
+  if(a>=1e6)return s+'$'+(a/1e6).toFixed(1)+'M';
+  if(a>=1e3)return s+'$'+Math.round(a/1e3)+'K';
+  return s+'$'+Math.round(a).toLocaleString('es-CO');
+}
+function pct(n){return n==null?'—':n.toFixed(1)+'%'}
+function fdate(s){
+  if(!s)return'';
+  const p=s.split('-'),m=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return`${parseInt(p[2])} ${m[parseInt(p[1])-1]||''} ${p[0]}`;
+}
+function getEvents(data){
+  if(!data)return[];
+  return Object.entries(data)
+    .filter(([k])=>k!=='updated'&&k!=='error')
+    .map(([k,v])=>({key:k,...v}));
+}
+
+// ── Icons ──────────────────────────────────────────────────────────────────
+const Ic = {
+  Home:()=><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+  Events:()=><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+  Compare:()=><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+  Money:()=><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+  Refresh:()=><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>,
+  ChevL:()=><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>,
+};
+
+// ── Margin pill ────────────────────────────────────────────────────────────
+function MPill({v,hi}){
+  if(!hi)return<span className="pill pill-n">Sin ingresos</span>;
+  if(v>=50)return<span className="pill pill-g">{pct(v)}</span>;
+  if(v>=25)return<span className="pill pill-y">{pct(v)}</span>;
+  return<span className="pill pill-r">{pct(v)}</span>;
+}
+
+// ── Loading ────────────────────────────────────────────────────────────────
+function Loading(){
+  return(
+    <div className="loading-wrap">
+      <div className="spinner"/>
+      <span style={{fontSize:14}}>Leyendo Google Sheets…</span>
+    </div>
+  );
+}
+
+// ── Overview ───────────────────────────────────────────────────────────────
+function Overview({events,onEv}){
+  const totI=events.reduce((a,e)=>a+e.summary.ingresos_netos,0);
+  const totN=events.reduce((a,e)=>a+e.summary.utilidad_neta,0);
+  const totG=events.reduce((a,e)=>a+e.summary.costo_ventas+e.summary.gastos_admin+e.summary.gastos_ventas,0);
+  const evWithI=events.filter(e=>e.summary.ingresos_netos>0);
+  const avgM=evWithI.length?evWithI.reduce((a,e)=>a+e.summary.margen_neto,0)/evWithI.length:0;
+  const allTx=events.flatMap(e=>e.transactions.map(t=>({...t,evName:e.name}))).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||'')).slice(0,10);
+
+  return(
+    <div className="page">
+      <div className="kgrid">
+        <div className="kcard hl">
+          <div className="klbl">Eventos activos</div>
+          <div className="kval yel">{events.length}</div>
+          <div className="ksub">{events.reduce((a,e)=>a+e.transactions.length,0)} transacciones</div>
+        </div>
+        <div className="kcard">
+          <div className="klbl">Ingresos totales</div>
+          <div className={`kval ${totI>0?'pos':''}`}>{cop(totI)}</div>
+          <div className="ksub">todos los eventos</div>
+        </div>
+        <div className="kcard">
+          <div className="klbl">Utilidad neta</div>
+          <div className={`kval ${totN>=0?'pos':'neg'}`}>{cop(totN)}</div>
+          <div className="ksub">{totN>=0?'▲ positivo':'▼ pérdida'}</div>
+        </div>
+        <div className="kcard">
+          <div className="klbl">Margen promedio</div>
+          <div className={`kval ${avgM>=30?'pos':avgM>0?'yel':'neg'}`}>{evWithI.length?pct(avgM):'—'}</div>
+          <div className="ksub">{evWithI.length} con ingresos</div>
+        </div>
+      </div>
+
+      <div className="sec-label">Eventos del período</div>
+      <div className="egrid">
+        {events.map(ev=><ECard key={ev.key} ev={ev} onClick={()=>onEv(ev)}/>)}
+      </div>
+
+      {allTx.length>0&&(
+        <div className="card">
+          <div className="card-head">
+            Movimientos recientes
+            <span className="card-sub">{events.reduce((a,e)=>a+e.transactions.length,0)} total</span>
+          </div>
+          <TxTable txs={allTx} showEv/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Event card ─────────────────────────────────────────────────────────────
+function ECard({ev,onClick}){
+  const s=ev.summary,hi=s.ingresos_netos>0;
+  const totCost=s.costo_ventas+s.gastos_admin+s.gastos_ventas;
+  return(
+    <div className="ecard" onClick={onClick}>
+      <div className="ecard-top">
+        <div>
+          <div className="ecard-name">{ev.name}</div>
+          <div className="ecard-meta">{ev.transactions.length} movimientos</div>
+        </div>
+        <MPill v={s.margen_neto} hi={hi}/>
+      </div>
+      <div className="ecard-metrics">
+        <div><div className="em-lbl">Ingresos</div><div className={`em-val ${hi?'pos':''}`}>{cop(s.ingresos_netos)}</div></div>
+        <div><div className="em-lbl">Costos</div><div className="em-val">{cop(totCost)}</div></div>
+        <div><div className="em-lbl">Utilidad</div><div className={`em-val ${s.utilidad_neta>=0?'pos':'neg'}`}>{cop(s.utilidad_neta)}</div></div>
+      </div>
+    </div>
+  );
+}
+
+// ── Tx table ───────────────────────────────────────────────────────────────
+function TxTable({txs,showEv}){
+  if(!txs.length)return<div className="empty">Sin transacciones registradas.</div>;
+  const cols=showEv?'76px 1fr 100px 90px auto':'76px 1fr 90px auto';
+  return(
+    <>
+      <div className="thr" style={{gridTemplateColumns:cols}}>
+        <span>Tipo</span><span>Concepto</span>
+        {showEv&&<span>Evento</span>}
+        <span>Persona</span><span style={{textAlign:'right'}}>Monto</span>
+      </div>
+      {txs.map((t,i)=>(
+        <div key={i} className="trow" style={{gridTemplateColumns:cols}}>
+          <span><span className={`badge ${t.tipo==='INGRESO'?'bi':'bg'}`}>{t.tipo}</span></span>
+          <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'var(--t)',paddingRight:8}}>{t.notas||t.concepto}</span>
+          {showEv&&<span style={{fontSize:11.5,color:'var(--t2)',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{t.evName}</span>}
+          <span style={{color:'var(--t2)',fontSize:12}}>{t.persona}</span>
+          <span style={{textAlign:'right',fontWeight:600,color:t.tipo==='INGRESO'?'var(--g)':'var(--r)',whiteSpace:'nowrap'}}>
+            {t.tipo==='INGRESO'?'+':'-'}{cop(t.valor)}
+          </span>
+        </div>
+      ))}
+    </>
+  );
+}
+
+// ── Events page ────────────────────────────────────────────────────────────
+function EventsPage({events}){
+  const [detail,setDetail]=useState(null);
+  if(detail)return<EventDetail ev={detail} onBack={()=>setDetail(null)}/>;
+  return(
+    <div className="page">
+      <div className="egrid">
+        {events.map(ev=><ECard key={ev.key} ev={ev} onClick={()=>setDetail(ev)}/>)}
+      </div>
+    </div>
+  );
+}
+
+// ── Event detail ───────────────────────────────────────────────────────────
+function EventDetail({ev,onBack}){
+  const s=ev.summary,hi=s.ingresos_netos>0;
+  const pl=[
+    {label:'Ingresos netos',val:s.ingresos_netos,cls:hi?'pos':'',bold:false},
+    {label:'− Costo de ventas',val:s.costo_ventas===0?null:-s.costo_ventas,cls:'',bold:false},
+    {label:'Utilidad bruta',val:s.utilidad_bruta,cls:s.utilidad_bruta>=0?'pos':'neg',bold:true},
+    ...(hi?[{label:'Margen bruto',extra:pct(s.margen_bruto),cls:'',bold:false,sub:true}]:[]),
+    {label:'− Gastos administración',val:s.gastos_admin===0?null:-s.gastos_admin,cls:'',bold:false},
+    {label:'− Gastos ventas',val:s.gastos_ventas===0?null:-s.gastos_ventas,cls:'',bold:false},
+    {label:'EBIT',val:s.ebit,cls:s.ebit>=0?'pos':'neg',bold:true},
+    {label:'Utilidad neta',val:s.utilidad_neta,cls:s.utilidad_neta>=0?'pos':'neg',bold:true},
+    ...(hi?[{label:'Margen neto',extra:pct(s.margen_neto),cls:'',bold:false,sub:true}]:[]),
+  ];
+
+  return(
+    <div className="page">
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:22,flexWrap:'wrap'}}>
+        <button className="back-btn" onClick={onBack}>
+          <div style={{width:14,height:14,display:'inline-block',verticalAlign:'middle',marginRight:4}}><Ic.ChevL/></div>
+          Volver
+        </button>
+        <h2 style={{fontSize:19,fontWeight:700,flex:1}}>{ev.name}</h2>
+        <MPill v={s.margen_neto} hi={hi}/>
+      </div>
+
+      <div className="kgrid">
+        {[['Ingresos netos',cop(s.ingresos_netos),hi?'pos':''],
+          ['Costo de ventas',cop(s.costo_ventas),''],
+          ['EBIT',cop(s.ebit),s.ebit>=0?'pos':'neg'],
+          ['Utilidad neta',cop(s.utilidad_neta),s.utilidad_neta>=0?'pos':'neg']
+        ].map(([l,v,c])=>(
+          <div className="kcard" key={l}>
+            <div className="klbl">{l}</div>
+            <div className={`kval ${c}`}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="card">
+        <div className="card-head">Estado de Resultados</div>
+        {pl.map((r,i)=>(
+          <div key={i} className={`pl-row${r.bold?' bold':''}${r.sub?' sub':''}`}>
+            <span style={{color:r.bold?'var(--t)':'var(--t2)'}}>{r.label}</span>
+            <span className={r.cls||''}>{r.extra||(r.val!=null?cop(r.val):'—')}</span>
+          </div>
+        ))}
+      </div>
+
+      {ev.por_persona?.filter(p=>p.total>0).length>0&&(
+        <div className="card">
+          <div className="card-head">Gastos por persona</div>
+          {ev.por_persona.filter(p=>p.total>0).map(p=>(
+            <div key={p.persona} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 20px',borderBottom:'.5px solid var(--b)',fontSize:13}}>
+              <div style={{display:'flex',alignItems:'center',gap:10}}>
+                <div className="avatar">{p.persona.slice(0,2).toUpperCase()}</div>
+                <span>{p.persona}</span>
+              </div>
+              <span style={{fontWeight:600}}>{cop(p.total)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="card">
+        <div className="card-head">
+          Transacciones
+          <span className="card-sub">{ev.transactions.length} registros</span>
+        </div>
+        <TxTable txs={ev.transactions}/>
+      </div>
+    </div>
+  );
+}
+
+// ── Compare page ───────────────────────────────────────────────────────────
+function ComparePage({events}){
+  const [sel,setSel]=useState(events.map(e=>e.key));
+  const chartRef=useRef(null);
+  const chartInst=useRef(null);
+  const filtered=events.filter(e=>sel.includes(e.key));
+
+  useEffect(()=>{
+    const ctx=chartRef.current;
+    if(!ctx)return;
+    if(chartInst.current){chartInst.current.destroy();chartInst.current=null;}
+    if(!filtered.length)return;
+    chartInst.current=new Chart(ctx,{
+      type:'bar',
+      data:{
+        labels:['Ingresos','Costo ventas','EBIT','Utilidad neta'],
+        datasets:filtered.map((ev,i)=>({
+          label:ev.name,
+          data:[ev.summary.ingresos_netos,ev.summary.costo_ventas,ev.summary.ebit,ev.summary.utilidad_neta],
+          backgroundColor:PALETTE[i%PALETTE.length],
+          borderRadius:5,
+          borderSkipped:false,
+        }))
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{labels:{color:'#888882',font:{size:12,family:'Inter'}}}},
+        scales:{
+          y:{ticks:{callback:v=>cop(v),color:'#888882',font:{size:11}},grid:{color:'rgba(255,255,255,0.04)'},border:{color:'#2A2A28'}},
+          x:{ticks:{color:'#888882',font:{size:11}},grid:{display:false},border:{color:'#2A2A28'}}
+        }
+      }
+    });
+    return()=>{if(chartInst.current)chartInst.current.destroy();};
+  },[sel,events.length]);
+
+  const metrics=[
+    ['Ingresos netos',ev=>cop(ev.summary.ingresos_netos)],
+    ['Costo de ventas',ev=>cop(ev.summary.costo_ventas)],
+    ['Utilidad bruta',ev=>cop(ev.summary.utilidad_bruta),true],
+    ['Margen bruto',ev=>ev.summary.ingresos_netos>0?pct(ev.summary.margen_bruto):'—'],
+    ['Gastos admin',ev=>cop(ev.summary.gastos_admin)],
+    ['EBIT',ev=>cop(ev.summary.ebit),true],
+    ['Utilidad neta',ev=>cop(ev.summary.utilidad_neta),true],
+    ['Margen neto',ev=>ev.summary.ingresos_netos>0?pct(ev.summary.margen_neto):'—'],
+    ['Transacciones',ev=>ev.transactions.length],
+  ];
+  const cols=`140px ${filtered.map(()=>'1fr').join(' ')}`;
+
+  return(
+    <div className="page">
+      <div style={{marginBottom:20}}>
+        <div className="sec-label">Seleccionar eventos</div>
+        <div className="chip-row">
+          {events.map(ev=>(
+            <div key={ev.key} className={`chip ${sel.includes(ev.key)?'on':''}`}
+              onClick={()=>setSel(s=>s.includes(ev.key)?s.filter(k=>k!==ev.key):[...s,ev.key])}>
+              {ev.name}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {!filtered.length&&<div className="empty">Seleccioná al menos un evento para comparar.</div>}
+
+      {filtered.length>0&&<>
+        <div className="card">
+          <div className="card-head">
+            Gráfico comparativo
+            <span className="card-sub" style={{display:'flex',gap:12}}>
+              {filtered.map((ev,i)=>(
+                <span key={ev.key} style={{display:'flex',alignItems:'center',gap:5}}>
+                  <span style={{width:10,height:10,borderRadius:2,background:PALETTE[i%PALETTE.length],display:'inline-block'}}/>
+                  {ev.name}
+                </span>
+              ))}
+            </span>
+          </div>
+          <div className="chart-wrap"><canvas ref={chartRef} role="img" aria-label="Gráfico comparativo de eventos"/></div>
+        </div>
+
+        <div className="card">
+          <div className="card-head">Tabla comparativa</div>
+          <div className="scroll-x">
+            <div style={{minWidth:380}}>
+              <div className="cthr" style={{gridTemplateColumns:cols}}>
+                <span>Indicador</span>
+                {filtered.map((ev,i)=><span key={ev.key} style={{textAlign:'center',color:PALETTE[i%PALETTE.length]}}>{ev.name}</span>)}
+              </div>
+              {metrics.map(([label,getter,bold])=>(
+                <div key={label} className={`ctr${bold?' bold':''}`} style={{gridTemplateColumns:cols}}>
+                  <span style={{color:'var(--t2)',fontSize:12}}>{label}</span>
+                  {filtered.map(ev=><span key={ev.key} style={{textAlign:'center'}}>{getter(ev)}</span>)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </>}
+    </div>
+  );
+}
+
+// ── Transactions page ──────────────────────────────────────────────────────
+function TxPage({events}){
+  const [q,setQ]=useState('');
+  const [fev,setFev]=useState('all');
+  const [ftype,setFtype]=useState('all');
+
+  const all=events.flatMap(e=>e.transactions.map(t=>({...t,evName:e.name,evKey:e.key})));
+  const totI=all.filter(t=>t.tipo==='INGRESO').reduce((a,b)=>a+b.valor,0);
+  const totG=all.filter(t=>t.tipo==='GASTO').reduce((a,b)=>a+b.valor,0);
+
+  const list=all
+    .filter(t=>fev==='all'||t.evKey===fev)
+    .filter(t=>ftype==='all'||t.tipo===ftype)
+    .filter(t=>!q||(t.notas+t.concepto+t.persona).toLowerCase().includes(q.toLowerCase()))
+    .sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+
+  return(
+    <div className="page">
+      <div className="kgrid" style={{gridTemplateColumns:'repeat(3,1fr)'}}>
+        <div className="kcard"><div className="klbl">Total ingresos</div><div className="kval pos">{cop(totI)}</div></div>
+        <div className="kcard"><div className="klbl">Total gastos</div><div className="kval">{cop(totG)}</div></div>
+        <div className="kcard"><div className="klbl">Balance</div><div className={`kval ${(totI-totG)>=0?'pos':'neg'}`}>{cop(totI-totG)}</div></div>
+      </div>
+
+      <div className="filters">
+        <input className="search-inp" placeholder="Buscar…" value={q} onChange={e=>setQ(e.target.value)}/>
+        <select className="fselect" value={fev} onChange={e=>setFev(e.target.value)}>
+          <option value="all">Todos los eventos</option>
+          {events.map(ev=><option key={ev.key} value={ev.key}>{ev.name}</option>)}
+        </select>
+        <select className="fselect" value={ftype} onChange={e=>setFtype(e.target.value)}>
+          <option value="all">Ingresos y gastos</option>
+          <option value="INGRESO">Solo ingresos</option>
+          <option value="GASTO">Solo gastos</option>
+        </select>
+      </div>
+
+      <div className="card">
+        <div className="card-head">
+          Movimientos
+          <span className="card-sub">{list.length} registros</span>
+        </div>
+        <TxTable txs={list} showEv/>
+      </div>
+    </div>
+  );
+}
+
+// ── App ────────────────────────────────────────────────────────────────────
+const NAV=[
+  {id:'overview',label:'Inicio',Icon:Ic.Home},
+  {id:'events',  label:'Eventos', Icon:Ic.Events},
+  {id:'compare', label:'Comparar',Icon:Ic.Compare},
+  {id:'tx',      label:'Movimientos',Icon:Ic.Money},
+];
+const PAGE_TITLES={overview:'Resumen general',events:'Eventos',compare:'Comparativa',tx:'Movimientos'};
+
+function App(){
+  const [page,setPage]=useState('overview');
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(null);
+  const [updated,setUpdated]=useState(null);
+  const [detailEv,setDetailEv]=useState(null);
+
+  async function load(){
+    setLoading(true);setError(null);
+    try{
+      const res=await fetch(API);
+      const json=await res.json();
+      if(json.error)throw new Error(json.error);
+      setData(json);setUpdated(json.updated);
+    }catch(e){setError(e.message);}
+    finally{setLoading(false);}
+  }
+
+  useEffect(()=>{load();},[]);
+
+  const events=getEvents(data);
+  function nav(id){setPage(id);setDetailEv(null);}
+
+  function handleEvClick(ev){setDetailEv(ev);setPage('events');}
+
+  return(
+    <div className="layout">
+      {/* Sidebar */}
+      <aside className="sidebar">
+        <div className="logo-wrap">
+          <div className="logo-mark">
+            <div className="logo-dot"/>
+            <div className="logo-name">LA PARADA</div>
+          </div>
+          <div className="logo-tagline">Dashboard interno</div>
+        </div>
+        <nav className="nav">
+          <div className="nav-section">Navegación</div>
+          {NAV.map(({id,label,Icon})=>(
+            <div key={id} className={`nav-item${page===id?' on':''}`} onClick={()=>nav(id)}>
+              <div className="nav-icon"><Icon/></div>
+              <span>{label}</span>
+            </div>
+          ))}
+        </nav>
+        <div className="sidebar-foot">
+          <div className="upd-lbl">Última actualización</div>
+          <div className="upd-val">{updated||'—'}</div>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main className="main">
+        <div className="topbar">
+          <div className="topbar-left">
+            <h1>{detailEv&&page==='events'?detailEv.name:PAGE_TITLES[page]}</h1>
+            <p>{events.length} eventos · {events.reduce((a,e)=>a+e.transactions.length,0)} transacciones</p>
+          </div>
+          <button className="refresh-btn" onClick={load}>
+            <Ic.Refresh/>
+            Actualizar
+          </button>
+        </div>
+
+        {loading?<Loading/>:error?(
+          <div className="page"><div className="errbox">⚠ {error} — verificá que el web app de Apps Script esté desplegado correctamente.</div></div>
+        ):(
+          <>
+            {page==='overview'&&<Overview events={events} onEv={handleEvClick}/>}
+            {page==='events'&&(detailEv?<EventDetail ev={detailEv} onBack={()=>setDetailEv(null)}/>:<EventsPage events={events}/>)}
+            {page==='compare'&&<ComparePage events={events}/>}
+            {page==='tx'&&<TxPage events={events}/>}
+          </>
+        )}
+      </main>
+
+      {/* Bottom nav (mobile) */}
+      <div className="bnav">
+        {NAV.map(({id,label,Icon})=>(
+          <div key={id} className={`bn-item${page===id?' on':''}`} onClick={()=>nav(id)}>
+            <Icon/>
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
