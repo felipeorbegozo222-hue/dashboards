@@ -13,7 +13,10 @@ export const useReveal = (start: number, dur = 24) => {
   return p;
 };
 
-export const Backdrop: React.FC<{ glowX?: string; glowY?: string }> = ({ glowX = "50%", glowY = "50%" }) => {
+export const Backdrop: React.FC<{ glowX?: string; glowY?: string }> = ({
+  glowX = "50%",
+  glowY = "50%",
+}) => {
   const frame = useCurrentFrame();
   const drift = interpolate(frame, [0, 300], [-40, 40]);
   return (
@@ -29,14 +32,18 @@ export const Backdrop: React.FC<{ glowX?: string; glowY?: string }> = ({ glowX =
           backgroundImage:
             "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
           backgroundSize: "120px 120px",
-          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+          maskImage:
+            "radial-gradient(ellipse at center, black 30%, transparent 75%)",
         }}
       />
     </AbsoluteFill>
   );
 };
 
-export const Eyebrow: React.FC<{ children: string; start?: number }> = ({ children, start = 0 }) => {
+export const Eyebrow: React.FC<{ children: string; start?: number }> = ({
+  children,
+  start = 0,
+}) => {
   const p = useReveal(start);
   return (
     <div

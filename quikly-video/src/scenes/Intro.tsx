@@ -1,12 +1,23 @@
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import {
+  AbsoluteFill,
+  interpolate,
+  useCurrentFrame,
+  useVideoConfig,
+} from "remotion";
 import { Backdrop, ease, useReveal } from "../ui";
 import { C, sans, serif } from "../theme";
 
 export const Intro: React.FC = () => {
   const frame = useCurrentFrame();
+  const { width, height } = useVideoConfig();
+  const v = height > width;
   const logo = useReveal(10, 40);
   const tag = useReveal(50, 30);
-  const line = interpolate(frame, [30, 80], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: ease });
+  const line = interpolate(frame, [30, 80], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: ease,
+  });
   return (
     <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
       <Backdrop />
@@ -15,7 +26,7 @@ export const Intro: React.FC = () => {
           style={{
             fontFamily: serif,
             fontWeight: 600,
-            fontSize: 220,
+            fontSize: v ? 190 : 220,
             letterSpacing: -4,
             color: C.text,
             opacity: logo,
@@ -25,12 +36,19 @@ export const Intro: React.FC = () => {
         >
           Quikly<span style={{ color: C.gold }}>.AI</span>
         </div>
-        <div style={{ height: 2, width: 560 * line, background: C.gold, margin: "20px auto 40px" }} />
+        <div
+          style={{
+            height: 2,
+            width: (v ? 420 : 560) * line,
+            background: C.gold,
+            margin: "20px auto 40px",
+          }}
+        />
         <div
           style={{
             fontFamily: sans,
-            fontSize: 44,
-            letterSpacing: 10,
+            fontSize: v ? 32 : 44,
+            letterSpacing: v ? 6 : 10,
             textTransform: "uppercase",
             color: C.muted,
             opacity: tag,

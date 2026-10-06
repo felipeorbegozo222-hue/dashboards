@@ -9,12 +9,62 @@ import { Services } from "./scenes/Services";
 export const RemotionRoot: React.FC = () => {
   return (
     <>
-      <Composition id="QuiklyPromo" component={QuiklyPromo} durationInFrames={780} fps={30} width={1920} height={1080} />
-      <Composition id="Intro" component={Intro} durationInFrames={130} fps={30} width={1920} height={1080} />
-      <Composition id="Problema" component={Problem} durationInFrames={170} fps={30} width={1920} height={1080} />
-      <Composition id="Servicios" component={Services} durationInFrames={200} fps={30} width={1920} height={1080} />
-      <Composition id="Proceso" component={Process} durationInFrames={190} fps={30} width={1920} height={1080} />
-      <Composition id="Cierre" component={Outro} durationInFrames={170} fps={30} width={1920} height={1080} />
+      <Composition
+        id="QuiklyPromo"
+        component={QuiklyPromo}
+        durationInFrames={780}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="QuiklyPromoVertical"
+        component={QuiklyPromo}
+        durationInFrames={780}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="Intro"
+        component={Intro}
+        durationInFrames={130}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Problema"
+        component={Problem}
+        durationInFrames={170}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Servicios"
+        component={Services}
+        durationInFrames={200}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Proceso"
+        component={Process}
+        durationInFrames={190}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
+      <Composition
+        id="Cierre"
+        component={Outro}
+        durationInFrames={170}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
     </>
   );
 };

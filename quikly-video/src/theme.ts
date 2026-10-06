@@ -2,7 +2,12 @@ import { loadFont } from "@remotion/fonts";
 import { staticFile } from "remotion";
 
 const load = (family: string, file: string, weight: string) =>
-  loadFont({ family, url: staticFile(`fonts/${file}`), weight, format: "woff2" });
+  loadFont({
+    family,
+    url: staticFile(`fonts/${file}`),
+    weight,
+    format: "woff2",
+  });
 
 export const serif = "Cormorant Garamond";
 export const sans = "Inter";
